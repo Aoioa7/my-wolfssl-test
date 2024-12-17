@@ -1,0 +1,6 @@
+[submodule "my-wolfssl-test/wolfssl"]
+	path = my-wolfssl-test/wolfssl
+	url = https://github.com/wolfssl/wolfssl
+[submodule "my-wolfssl-test/wolfssl-examples"]
+	path = my-wolfssl-test/wolfssl-examples
+	url = https://github.com/wolfssl/wolfssl-examples
