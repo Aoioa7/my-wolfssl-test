@@ -39,6 +39,7 @@ void broadcast_message(const char* msg, int exclude_index) {
     pthread_mutex_unlock(&clients_lock);
 }
 
+// スレッド関数の戻り値はvoid*型
 void* client_handler(void* arg) {
     int index = *(int*)arg;
     free(arg);
@@ -99,6 +100,25 @@ int create_socket(int* server_fd,struct sockaddr_in* server_addr,int opt) {
 	return 0;
 }
 
+int create_wolf_ssl_obj(int client_sock,WOLFSSL* ssl) {
+	    ssl = wolfSSL_new(ctx);
+        if (!ssl) {
+            fprintf(stderr, "wolfSSL_new failed.\n");
+            close(client_sock);
+            return 1;
+        }
+
+        wolfSSL_set_fd(ssl, client_sock);
+
+        if (wolfSSL_accept(ssl) != SSL_SUCCESS) {
+            fprintf(stderr, "wolfSSL_accept failed.\n");
+            wolfSSL_free(ssl);
+            close(client_sock);
+            return 1;
+        }
+		return 0;
+}
+
 
 int main() {
     int server_fd;
@@ -140,21 +160,10 @@ int main() {
         }
 
         // wolfSSL用SSLオブジェクト生成
-        WOLFSSL* ssl = wolfSSL_new(ctx);
-        if (!ssl) {
-            fprintf(stderr, "wolfSSL_new failed.\n");
-            close(client_sock);
-            continue;
-        }
-
-        wolfSSL_set_fd(ssl, client_sock);
-
-        if (wolfSSL_accept(ssl) != SSL_SUCCESS) {
-            fprintf(stderr, "wolfSSL_accept failed.\n");
-            wolfSSL_free(ssl);
-            close(client_sock);
-            continue;
-        }
+		WOLFSSL* ssl;
+       if (create_wolf_ssl_obj(client_sock,ssl) == 1) {
+		continue;
+	   }
 
         // クライアントスロットを確保
         pthread_mutex_lock(&clients_lock);
