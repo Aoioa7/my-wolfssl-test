@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     wolfSSL_Init();
     WOLFSSL_CTX* ctx = wolfSSL_CTX_new(wolfTLSv1_2_client_method());
     if (!ctx) {
-        fprintf(stderr, "wolfSSL_CTX_new error.\n");
+        fprintf(stderr, "wolfSSL_CTX_new failed.\n");
         return 1;
     }
 
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
     WOLFSSL* ssl = wolfSSL_new(ctx);
     if (!ssl) {
-        fprintf(stderr, "wolfSSL_new error.\n");
+        fprintf(stderr, "wolfSSL_new failed.\n");
         return 1;
     }
 

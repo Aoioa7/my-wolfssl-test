@@ -31,7 +31,8 @@ void broadcast_message(const char* msg, int exclude_index) {
         if (i != exclude_index && clients[i].active) {
             int ret = wolfSSL_write(clients[i].ssl, msg, strlen(msg));
             if (ret <= 0) {
-                // 書き込みエラー時の処理(簡略化)
+                // 書き込みエラー
+				fprintf(stderr, "%d: wolfSSL_write failed.\n",i);
             }
         }
     }
@@ -79,7 +80,7 @@ int main() {
     wolfSSL_Init();
     ctx = wolfSSL_CTX_new(wolfTLSv1_2_server_method());
     if (ctx == NULL) {
-        fprintf(stderr, "wolfSSL_CTX_new error.\n");
+        fprintf(stderr, "wolfSSL_CTX_new failed.\n");
         return 1;
     }
 
@@ -130,7 +131,7 @@ int main() {
         // wolfSSL用SSLオブジェクト生成
         WOLFSSL* ssl = wolfSSL_new(ctx);
         if (!ssl) {
-            fprintf(stderr, "wolfSSL_new error.\n");
+            fprintf(stderr, "wolfSSL_new failed.\n");
             close(client_sock);
             continue;
         }
