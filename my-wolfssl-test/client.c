@@ -30,7 +30,7 @@ void* recv_handler(void* arg) {
             // サーバー切断 or エラー
             break;
         }
-        printf("[RECV] %s\n", buf);
+        printf("[RECV] %s", buf);
     }
     return NULL;
 }
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
         if (fgets(msg, BUF_SIZE, stdin) == NULL) {
             break;
         }
-        if (strcmp(msg, "/quit\n") == 0) {
+        if (strcmp(msg, "exit\n") == 0) {
             break;
         }
         int ret = wolfSSL_write(ssl, msg, strlen(msg));
