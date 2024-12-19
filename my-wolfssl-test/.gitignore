@@ -1,3 +1,5 @@
 *.pem
 *.csr
 *.srl
+server
+client
