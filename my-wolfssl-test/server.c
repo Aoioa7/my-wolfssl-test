@@ -100,19 +100,19 @@ int create_socket(int* server_fd,struct sockaddr_in* server_addr,int opt) {
 	return 0;
 }
 
-int create_wolf_ssl_obj(int client_sock,WOLFSSL* ssl) {
-	    ssl = wolfSSL_new(ctx);
-        if (!ssl) {
+int create_wolf_ssl_obj(int client_sock,WOLFSSL** ssl) {
+	    *ssl = wolfSSL_new(ctx);
+        if (!*ssl) {
             fprintf(stderr, "wolfSSL_new failed.\n");
             close(client_sock);
             return 1;
         }
 
-        wolfSSL_set_fd(ssl, client_sock);
+        wolfSSL_set_fd(*ssl, client_sock);
 
-        if (wolfSSL_accept(ssl) != SSL_SUCCESS) {
+        if (wolfSSL_accept(*ssl) != SSL_SUCCESS) {
             fprintf(stderr, "wolfSSL_accept failed.\n");
-            wolfSSL_free(ssl);
+            wolfSSL_free(*ssl);
             close(client_sock);
             return 1;
         }
@@ -161,7 +161,7 @@ int main() {
 
         // wolfSSL用SSLオブジェクト生成
 		WOLFSSL* ssl;
-       if (create_wolf_ssl_obj(client_sock,ssl) == 1) {
+       if (create_wolf_ssl_obj(client_sock,&ssl) == 1) {
 		continue;
 	   }
 
