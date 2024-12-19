@@ -70,6 +70,35 @@ void* client_handler(void* arg) {
     return NULL;
 }
 
+int create_socket(int* server_fd,struct sockaddr_in* server_addr,int opt) {
+	    int fd;
+	  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("socket failed");
+        return 1;
+    }
+
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+    memset(server_addr, 0, sizeof(*server_addr));
+    server_addr->sin_family = AF_INET;
+    server_addr->sin_addr.s_addr = INADDR_ANY;
+    server_addr->sin_port = htons(PORT);
+
+    if (bind(fd, (struct sockaddr*)server_addr, sizeof(*server_addr))<0) {
+        perror("bind failed");
+		close(fd);
+        return 1;
+    }
+
+    if (listen(fd, 5) < 0) {
+        perror("listen failed");
+		close(fd);
+        return 1;
+    }
+	*server_fd = fd;
+	return 0;
+}
+
 
 int main() {
     int server_fd;
@@ -95,27 +124,9 @@ int main() {
     }
 
     // ソケット作成
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-        perror("socket failed");
-        return 1;
-    }
-
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(PORT);
-
-    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr))<0) {
-        perror("bind failed");
-        return 1;
-    }
-
-    if (listen(server_fd, 5) < 0) {
-        perror("listen failed");
-        return 1;
-    }
+    if (create_socket(&server_fd,&server_addr,opt) == 1) {
+		return 1;
+	}
 
     printf("Server listening on port %d...\n", PORT);
 
